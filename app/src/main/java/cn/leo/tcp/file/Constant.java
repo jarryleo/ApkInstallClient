@@ -16,7 +16,7 @@ interface Constant {
     /**
      * 文件缓冲区大小
      */
-    int BUFFER_SIZE = 1024;
+    int BUFFER_SIZE = 1024 * 64;
     /**
      * 连接类型为请求传输文件
      */
