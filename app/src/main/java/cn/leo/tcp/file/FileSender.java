@@ -7,6 +7,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -115,7 +116,7 @@ class FileSender {
                 fileInfo.setPartSize(partLength);
                 fileInfo.setPartIndex(partIndex);
                 fileInfo.setType(Constant.CONNECTION_TYPE_THREAD);
-                sendChannel.write(ByteBuffer.wrap(fileInfo.toString().getBytes()));
+                sendChannel.write(ByteBuffer.wrap(fileInfo.toString().getBytes(Charset.forName("UTF-8"))));
                 //等待应答信息(获取断点)
                 ByteBuffer buffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
                 int len;
@@ -185,7 +186,7 @@ class FileSender {
             fileInfo.setFileName(file.getName());
             fileInfo.setFileSize(file.length());
             fileInfo.setType(Constant.CONNECTION_TYPE_REQUEST);
-            askChannel.write(ByteBuffer.wrap(fileInfo.toString().getBytes()));
+            askChannel.write(ByteBuffer.wrap(fileInfo.toString().getBytes(Charset.forName("UTF-8"))));
             //3.等待应答信息
             ByteBuffer buffer = ByteBuffer.allocate(Constant.BUFFER_SIZE);
             int len = 0;

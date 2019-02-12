@@ -79,7 +79,7 @@ class FileReceiver extends Thread {
                 break;
             }
         }
-        String json = baos.toString();
+        String json = baos.toString("UTF-8");
         FileInfo fileInfo = JSONObject.parseObject(json, FileInfo.class);
         if (fileInfo.getType() == Constant.CONNECTION_TYPE_REQUEST) {
             //文件请求类型

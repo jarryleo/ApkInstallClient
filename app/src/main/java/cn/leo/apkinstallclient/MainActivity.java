@@ -75,7 +75,7 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
                 IOThreadPool.execute(new Runnable() {
                     @Override
                     public void run() {
-                        mSender.sendBroadcast("list".getBytes());
+                        mSender.sendBroadcast("list".getBytes(Charset.forName("UTF-8")));
                     }
                 });
             }
@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
         IOThreadPool.execute(new Runnable() {
             @Override
             public void run() {
-                mSender.send(fileName.getBytes());
+                mSender.send(fileName.getBytes(Charset.forName("UTF-8")));
             }
         });
     }
