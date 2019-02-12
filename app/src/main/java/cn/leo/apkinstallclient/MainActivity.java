@@ -10,11 +10,14 @@ import android.os.Bundle;
 import android.os.Environment;
 import android.provider.Settings;
 import android.support.annotation.RequiresApi;
+import android.support.design.widget.TabLayout;
 import android.support.v4.content.FileProvider;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
+import android.view.View;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.alibaba.fastjson.JSONObject;
@@ -25,6 +28,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 import cn.leo.permission.PermissionRequest;
 import cn.leo.tcp.file.FileInfo;
@@ -47,6 +51,9 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
     private FileTransfer mFileTransfer;
     private RvFileListAdapter mAdapter;
     private File mDir;
+    private TextView mTvTips;
+    private TabLayout mTabLayout;
+    private ConcurrentHashMap<String, List<FileInfo>> mTabsMap = new ConcurrentHashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +65,31 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
     }
 
     private void initView() {
+        mTabLayout = findViewById(R.id.tabLayout);
+        mTvTips = findViewById(R.id.tvTips);
         mRvList = findViewById(R.id.rvList);
         mSwipeRefreshLayout = findViewById(R.id.swipeRefresh);
         mRvList.setLayoutManager(new LinearLayoutManager(this, LinearLayoutManager.VERTICAL, false));
         mAdapter = new RvFileListAdapter();
         mRvList.setAdapter(mAdapter);
+        mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
+            @Override
+            public void onTabSelected(TabLayout.Tab tab) {
+                String s = tab.getText().toString();
+                List<FileInfo> list = mTabsMap.get(s);
+                mAdapter.setData(list);
+            }
+
+            @Override
+            public void onTabUnselected(TabLayout.Tab tab) {
+
+            }
+
+            @Override
+            public void onTabReselected(TabLayout.Tab tab) {
+
+            }
+        });
     }
 
     private void initEvent() {
@@ -113,6 +140,7 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
         mSender.setRemoteHost(host);
         final String s = new String(data, Charset.forName("UTF-8"));
         final List<FileInfo> fileInfoList = JSONObject.parseArray(s, FileInfo.class);
+        mTabsMap.put(host, fileInfoList);
         Collections.sort(fileInfoList, new Comparator<FileInfo>() {
             @Override
             public int compare(FileInfo o1, FileInfo o2) {
@@ -122,6 +150,17 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
+                if (fileInfoList.size() > 0) {
+                    mTvTips.setVisibility(View.GONE);
+                } else {
+                    mTvTips.setVisibility(View.VISIBLE);
+                }
+                mTabLayout.removeAllTabs();
+                for (Map.Entry<String, List<FileInfo>> entry : mTabsMap.entrySet()) {
+                    TabLayout.Tab tab = mTabLayout.newTab();
+                    tab.setText(entry.getKey());
+                    mTabLayout.addTab(tab, true);
+                }
                 mAdapter.setData(fileInfoList);
             }
         });

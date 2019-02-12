@@ -71,7 +71,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View v) {
         if (mTvProgress.getVisibility() == View.VISIBLE) {
             String s = mTvProgress.getText().toString();
-            if (!"已下载".equals(s)) {
+            if (!"已下载".equals(s) && !"下载完成".equals(s)) {
                 return;
             }
         }
@@ -81,7 +81,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
             ((MainActivity) context).getFile(s);
             if (mTvProgress.getVisibility() != View.VISIBLE) {
                 mTvProgress.setVisibility(View.VISIBLE);
-                mTvProgress.setText("开始下载");
+                mTvProgress.setText("等待下载");
             }
         }
     }
