@@ -20,6 +20,9 @@ import android.widget.Toast;
 import com.alibaba.fastjson.JSONObject;
 
 import java.io.File;
+import java.nio.charset.Charset;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -108,8 +111,14 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
     @Override
     public void onDataArrived(final byte[] data, String host, int port) {
         mSender.setRemoteHost(host);
-        final String s = new String(data);
+        final String s = new String(data, Charset.forName("UTF-8"));
         final List<FileInfo> fileInfoList = JSONObject.parseArray(s, FileInfo.class);
+        Collections.sort(fileInfoList, new Comparator<FileInfo>() {
+            @Override
+            public int compare(FileInfo o1, FileInfo o2) {
+                return Long.valueOf(o2.getStart()).compareTo(Long.valueOf(o1.getStart()));
+            }
+        });
         runOnUiThread(new Runnable() {
             @Override
             public void run() {

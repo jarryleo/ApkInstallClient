@@ -6,6 +6,7 @@ import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 
@@ -21,6 +22,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
     private final TextView mTvFileSize;
     private final ProgressBar mProgressBar;
     private final TextView mTvProgress;
+    private File mDir;
 
     public RvFileListHolder(View itemView) {
         super(itemView);
@@ -51,6 +53,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
             if (percent == 100) {
                 mTvProgress.setText("下载完成");
                 mProgressBar.setVisibility(View.INVISIBLE);
+                Toast.makeText(itemView.getContext(), "文件已成功下载到" + mDir.getAbsolutePath(), Toast.LENGTH_SHORT).show();
             } else {
                 mProgressBar.setVisibility(View.VISIBLE);
                 mTvProgress.setText(String.valueOf(percent) + "%");
@@ -59,8 +62,8 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
     }
 
     private boolean checkFileExits(String fileName) {
-        File dir = itemView.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
-        File file = new File(dir, fileName);
+        mDir = itemView.getContext().getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS);
+        File file = new File(mDir, fileName);
         return file.exists();
     }
 
