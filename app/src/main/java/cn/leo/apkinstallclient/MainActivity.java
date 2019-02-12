@@ -75,9 +75,10 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
         mTabLayout.addOnTabSelectedListener(new TabLayout.OnTabSelectedListener() {
             @Override
             public void onTabSelected(TabLayout.Tab tab) {
-                String s = tab.getText().toString();
-                List<FileInfo> list = mTabsMap.get(s);
+                String host = tab.getText().toString();
+                List<FileInfo> list = mTabsMap.get(host);
                 mAdapter.setData(list);
+                mSender.setRemoteHost(host);
             }
 
             @Override
@@ -98,6 +99,7 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
         mSwipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
+                mTabsMap.clear();
                 mSwipeRefreshLayout.setRefreshing(false);
                 IOThreadPool.execute(new Runnable() {
                     @Override
@@ -155,13 +157,21 @@ public class MainActivity extends AppCompatActivity implements OnDataArrivedList
                 } else {
                     mTvTips.setVisibility(View.VISIBLE);
                 }
+                TabLayout.Tab tabAt = mTabLayout.getTabAt(mTabLayout.getSelectedTabPosition());
+                String s1 = tabAt.getText().toString();
                 mTabLayout.removeAllTabs();
                 for (Map.Entry<String, List<FileInfo>> entry : mTabsMap.entrySet()) {
                     TabLayout.Tab tab = mTabLayout.newTab();
-                    tab.setText(entry.getKey());
-                    mTabLayout.addTab(tab, true);
+                    String key = entry.getKey();
+                    tab.setText(key);
+                    if (key.equals(s1)) {
+                        mTabLayout.addTab(tab, true);
+                        List<FileInfo> infoList = mTabsMap.get(key);
+                        mAdapter.setData(infoList);
+                    } else {
+                        mTabLayout.addTab(tab);
+                    }
                 }
-                mAdapter.setData(fileInfoList);
             }
         });
     }

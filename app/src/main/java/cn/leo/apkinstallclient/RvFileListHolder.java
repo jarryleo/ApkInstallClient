@@ -42,7 +42,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
         if (checkFileExits(fileName)) {
             mProgressBar.setVisibility(View.INVISIBLE);
             mTvProgress.setVisibility(View.VISIBLE);
-            mTvProgress.setText("已下载");
+            mTvProgress.setText("下载完成");
             return;
         }
         if (type == 0) {
@@ -71,7 +71,7 @@ public class RvFileListHolder extends RecyclerView.ViewHolder implements View.On
     public void onClick(View v) {
         if (mTvProgress.getVisibility() == View.VISIBLE) {
             String s = mTvProgress.getText().toString();
-            if (!"已下载".equals(s) && !"下载完成".equals(s)) {
+            if (!"下载完成".equals(s)) {
                 return;
             }
         }
