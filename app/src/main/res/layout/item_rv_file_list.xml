@@ -14,12 +14,15 @@
 
 
         <TextView
+            app:layout_constraintRight_toLeftOf="@id/progressBar"
             android:id="@+id/tvFileName"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
+            app:layout_constraintHorizontal_weight="1"
             android:layout_height="wrap_content"
             android:layout_marginLeft="16dp"
+            android:layout_marginRight="16dp"
             android:layout_marginTop="16dp"
-            android:text="文件名"
+            android:text="文件名文件名文件名文件名文件名文件名文件名文件名"
             android:textColor="@color/colorPrimary"
             android:textSize="18sp"
             app:layout_constraintLeft_toLeftOf="parent"
