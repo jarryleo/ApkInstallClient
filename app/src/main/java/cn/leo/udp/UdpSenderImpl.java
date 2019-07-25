@@ -2,7 +2,9 @@ package cn.leo.udp;
 
 import java.net.Inet6Address;
 import java.net.InetAddress;
+import java.net.InterfaceAddress;
 import java.net.NetworkInterface;
+import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
 
@@ -15,7 +17,7 @@ class UdpSenderImpl implements UdpSender {
     private int port = UdpConfig.DEFAULT_LISTEN_PORT;
     private PacketProcessor packetProcessor = new DefaultPacketProcessor();
     private UdpSendCore udpSendCore = new UdpSendCore();
-    private String broadcastHost;
+    private List<String> broadcastHost = new ArrayList<>();
 
     UdpSenderImpl() {
     }
@@ -60,12 +62,18 @@ class UdpSenderImpl implements UdpSender {
 
     @Override
     public UdpSender sendBroadcast(byte[] data) {
-        if (broadcastHost == null) {
+        if (broadcastHost.size() == 0) {
             getBroadcastHost();
+        }
+        if (broadcastHost.size() == 0) {
+            System.out.println("broadcastHost not found !");
+            return this;
         }
         List<byte[]> bytes = packetProcessor.subPacket(data);
         for (byte[] aByte : bytes) {
-            udpSendCore.sendData(aByte, broadcastHost, port);
+            for (String broadcast : broadcastHost) {
+                udpSendCore.sendData(aByte, broadcast, port);
+            }
         }
         return this;
     }
@@ -73,21 +81,20 @@ class UdpSenderImpl implements UdpSender {
     private void getBroadcastHost() {
         try {
             Enumeration nis = NetworkInterface.getNetworkInterfaces();
-            InetAddress ia = null;
             while (nis.hasMoreElements()) {
                 NetworkInterface ni = (NetworkInterface) nis.nextElement();
-                Enumeration<InetAddress> ias = ni.getInetAddresses();
-                while (ias.hasMoreElements()) {
-                    ia = ias.nextElement();
-                    if (ia instanceof Inet6Address) {
-                        continue;// skip ipv6
+                List<InterfaceAddress> iaList = ni.getInterfaceAddresses();
+                for (InterfaceAddress ia : iaList) {
+                    InetAddress iaAddress = ia.getAddress();
+                    if (iaAddress instanceof Inet6Address) {
+                        // skip ipv6
+                        continue;
                     }
-                    String ip = ia.getHostAddress();
+                    String ip = iaAddress.getHostAddress();
+                    System.out.println(ip);
                     if (!"127.0.0.1".equals(ip)) {
-                        byte[] bytes = ia.getAddress();
-                        bytes[3] = (byte) 255;
-                        broadcastHost = InetAddress.getByAddress(bytes).getHostAddress();
-                        break;
+                        broadcastHost.add(ia.getBroadcast().getHostAddress());
+                        System.out.println("broadcastHost: " + broadcastHost);
                     }
                 }
             }
